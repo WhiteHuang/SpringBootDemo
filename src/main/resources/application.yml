@@ -1,0 +1,31 @@
+server:
+  ip: 192.168.1.9
+  port: 9090
+#spring:application.name=SpringBootDemo
+spring:
+  application:
+    name: SpringBootDemo
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/demo?serverTimezone=GMT%2b8
+    username: root
+#    password: White1229&
+    password: root
+
+mybatis:
+  mapper-locations:
+    classpath:mapper/*.xml #??????xml??
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #??sql?log
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #??sql?log
+
+springdoc:
+  swagger-ui.path: /swagger-ui.html
+
+files:
+  upload:
+    path: /home/files/
+#    path: E:/project/java/SpringBootDemo/files/
