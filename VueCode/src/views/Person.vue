@@ -1,0 +1,121 @@
+<script>
+import {serverIp} from "../../public/config";
+
+export default {
+  name: "Person",
+
+  data() {
+    return {
+      form: {},
+      user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {},
+      uploadUrl:"http://"+serverIp+":9090/file/upload"
+    }
+  },
+  created() {
+    this.getUser()
+  },
+  methods: {
+
+    getUser(){
+      this.request.get("/user/username/" + this.user.username).then(
+          res => {
+            if (res.code === '200') {
+              this.form = res.data;
+            }
+          }
+      )
+    },
+
+    save() {
+
+      this.request.post("/user", this.form)
+          .then(res => {
+            if (res) {
+              this.$message.success("保存成功！")
+              this.user.avatarUrl=this.form.avatarUrl
+              this.user.nickname=this.form.nickname
+              this.user.username=this.form.username
+              localStorage.setItem("user",JSON.stringify(this.user))
+              //触发父级更新方法
+              this.$emit("refreshUser")
+            } else {
+              this.$message.error("保存失败！")
+            }
+          })
+    },
+    handleAvatarSuccess(res) {
+      this.form.avatarUrl = res.data;
+      console.log(res)
+      this.$message.success("上传成功！")
+    },
+  }
+}
+</script>
+
+<template>
+  <el-card style="width: 500px;padding: 20px;border: 1px ; ">
+    <el-form label-width="90px" size="medium">
+      <el-upload
+          class="avatar-uploader"
+          :action="uploadUrl"
+          :show-file-list="false"
+          :on-success="handleAvatarSuccess">
+        <img v-if="form.avatarUrl" :src="form.avatarUrl" class="avatar">
+        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+      </el-upload>
+      <el-form-item label="用户名">
+        <el-input v-model="form.username" disabled autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="邮箱">
+        <el-input v-model="form.email" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="电话">
+        <el-input v-model="form.phone" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="地址">
+        <el-input v-model="form.address" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="昵称">
+        <el-input v-model="form.nickname" autocomplete="off"></el-input>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="primary" @click="save">确 定</el-button>
+      </el-form-item>
+    </el-form>
+  </el-card>
+</template>
+
+<style scoped>
+.avatar-uploader {
+  text-align: center;
+  padding-bottom: 10px;
+}
+
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 18px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
+
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 138px;
+  height: 138px;
+  line-height: 138px;
+  text-align: center;
+}
+
+.avatar {
+  width: 138px;
+  height: 138px;
+  display: block;
+}
+</style>
