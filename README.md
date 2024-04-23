@@ -4,10 +4,10 @@ SpringBoot简单练习
 
 ## 技术栈
 ### 后端                             
-SpringBoot2
-Hutool
-Poi
-Lombok
+SpringBoot2  <br>
+Hutool  <br>
+Poi  <br>
+Lombok  
 Mybatis/Mybatis-plus
 
 ### 前端
