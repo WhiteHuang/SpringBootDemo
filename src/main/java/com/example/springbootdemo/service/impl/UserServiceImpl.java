@@ -3,6 +3,7 @@ package com.example.springbootdemo.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springbootdemo.common.Constants;
 import com.example.springbootdemo.controller.dto.UserDto;
 import com.example.springbootdemo.entity.Menu;
@@ -37,6 +38,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Resource
     private IMenuService menuService;
 
+    @Resource
+    private UserMapper userMapper;
+
     @Override
     public UserDto login(UserDto userDto) {
         User one = getUser(userDto);
@@ -62,7 +66,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         List<Integer> roleMenus = roleService.getRoleMenu(roleBean.getId());
 
-        List<Menu> menus = menuService.getMenus("");
+        List<Menu> menus = menuService.getMenus("","");
         List<Menu> reusltMenus = new ArrayList<>();
         for (Menu menu : menus) {
             if (roleMenus.contains(menu.getId())) {
@@ -89,6 +93,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         } else {
             throw new ServiceException(Constants.CODE_600, "用户名已存在");
         }
+    }
+
+    @Override
+    public Page<User> findPage(Page<User> objectPage, String username, String email, String address) {
+
+        return userMapper.findPage(objectPage,username,email,address);
     }
 
     private User getUser(UserDto userDto) {

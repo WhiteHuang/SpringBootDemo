@@ -14,8 +14,10 @@ export default {
       email: "",
       address: "",
       dialogFormVisible: false,
+      dialogCourseFormVisible: false,
       form: {},
       options:[],
+      courses:[],
       uploadUrl:"http://"+serverIp+":9090/user/import"
     }
   },
@@ -42,8 +44,11 @@ export default {
         }
       })
           .then(res => {
-            this.tableData = res.records
-            this.total = res.total
+            if(res.code==='200'){
+              this.tableData = res.data.records
+              this.total = res.data.total
+            }
+
           })
 
       this.request.get("/role").then(res=>{
@@ -59,6 +64,14 @@ export default {
     handleEdit(row) {
       this.dialogFormVisible = true
       this.form = JSON.parse(JSON.stringify(row))
+    },
+    viewCourse(row) {
+      if(row.role==='ROLE_TEACHER'){
+        this.courses=row.courses
+      }else if(row.role==='ROLE_STUDENT'){
+        this.courses=row.stuCourses
+      }
+      this.dialogCourseFormVisible=true
     },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`)
@@ -183,13 +196,22 @@ export default {
       </el-table-column>
       <el-table-column prop="id" label="ID" width="80"></el-table-column>
       <el-table-column prop="username" label="用户名" width="140"></el-table-column>
-      <el-table-column prop="role" label="角色" width="140"></el-table-column>
+      <el-table-column prop="role" label="角色" width="140">
+        <template slot-scope="scope">
+          <el-tag type="primary" v-if="scope.row.role==='ROLE_STUDENT'">学生</el-tag>
+          <el-tag type="warning" v-if="scope.row.role==='ROLE_TEACHER'">教师</el-tag>
+          <el-tag type="success" v-if="scope.row.role==='ROLE_ADMIN'">管理员</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="nickname" label="姓名" width="120"></el-table-column>
       <el-table-column prop="phone" label="手机号"></el-table-column>
       <el-table-column prop="email" label="邮箱"></el-table-column>
       <el-table-column prop="address" label="地址"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
+
+          <el-button type="warning" @click="viewCourse(scope.row)" v-if="scope.row.role==='ROLE_TEACHER'">查看任课<i class="el-icon-view" style="margin-left: 3px"></i></el-button>
+          <el-button type="primary" @click="viewCourse(scope.row)" v-if="scope.row.role==='ROLE_STUDENT'">查看选课<i class="el-icon-view" style="margin-left: 3px"></i></el-button>
           <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
           <el-popconfirm
               class="ml-5"
@@ -248,6 +270,20 @@ export default {
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="save">确 定</el-button>
       </div>
+    </el-dialog>
+
+    <el-dialog title="课程信息" :visible.sync="dialogCourseFormVisible" width="30%">
+      <el-table :data="courses" border stripe :header-cell-style="{background:'#eef1f6',color:'#606266'}">
+        <el-table-column prop="name" label="课程名称"></el-table-column>
+        <el-table-column prop="score" label="课程学分"></el-table-column>
+        <el-table-column prop="times" label="课时"></el-table-column>
+<!--        <el-table-column prop="state" label="是否开课">-->
+<!--          <template slot-scope="scope">-->
+<!--            <el-switch v-model="scope.row.state" active-color="#13ce66" inactive-color="#ccc"-->
+<!--                       @change="changeState(scope.row)" ></el-switch>-->
+<!--          </template>-->
+<!--        </el-table-column>-->
+      </el-table>
     </el-dialog>
   </div>
 </template>

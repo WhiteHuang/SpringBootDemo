@@ -30,10 +30,8 @@ export default {
       //     )
       this.request.get("/menu", {
         params: {
-          // pageNum: this.pageNum,
-          // pageSize: this.pageSize,
-          // name: this.name,
-          // description: this.description,
+          name: this.name,
+          description: this.description,
         }
       })
           .then(res => {
@@ -47,6 +45,7 @@ export default {
     handleAdd() {
       this.dialogFormVisible = true
       this.form = {}
+      this.loadIcons()
     },
     handleEdit(row) {
       this.dialogFormVisible = true
@@ -63,6 +62,7 @@ export default {
     loadIcons(){
       this.request.get("/menu/icons").then(res=>{
         if(res.code==='200'){
+          console.log(JSON.stringify(res.data))
           this.options=res.data
         }
       })
@@ -171,6 +171,7 @@ export default {
         </template>
       </el-table-column>
       <el-table-column prop="description" label="描述"></el-table-column>
+      <el-table-column prop="sort" label="顺序"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
 
@@ -202,6 +203,9 @@ export default {
         </el-form-item>
         <el-form-item label="页面组件">
           <el-input v-model="form.component" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="顺序">
+          <el-input v-model="form.sort" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="图标">
           <template slot-scope="scope">

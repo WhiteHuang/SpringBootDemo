@@ -53,8 +53,8 @@ export default {
       </div>
       <el-dropdown-menu slot="dropdown">
 
-        <el-dropdown-item @click=""><router-link to="/updatepwd" style="text-decoration: none">修改密码</router-link></el-dropdown-item>
-        <el-dropdown-item @click=""><router-link to="/person" style="text-decoration: none">个人信息</router-link></el-dropdown-item>
+        <el-dropdown-item style="text-decoration: none"><router-link to="/updatepwd" style="text-decoration: none">修改密码</router-link></el-dropdown-item>
+        <el-dropdown-item style="text-decoration: none"><router-link to="/person" style="text-decoration: none">个人信息</router-link></el-dropdown-item>
         <el-dropdown-item @click="">
         <span  style="text-decoration: none" @click="logout">退出</span>
         </el-dropdown-item>

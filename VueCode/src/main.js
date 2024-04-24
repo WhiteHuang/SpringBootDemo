@@ -5,12 +5,14 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import './assets/gloabl.css'
 import request from "@/utils/request";
+import store from "./store/index"
 
 Vue.config.productionTip = false
 
 Vue.use(ElementUI,{size:"small"});
 
 Vue.prototype.request=request
+Vue.prototype.$store=store  //全局注册
 
 new Vue({
   router,

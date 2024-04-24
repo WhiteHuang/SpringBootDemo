@@ -8,9 +8,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springbootdemo.common.Constants;
 import com.example.springbootdemo.common.Result;
+import com.example.springbootdemo.controller.dto.PwdDto;
 import com.example.springbootdemo.controller.dto.UserDto;
 import com.example.springbootdemo.entity.User;
 import com.example.springbootdemo.service.IUserService;
+import com.example.springbootdemo.utils.TokenUtil;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +51,12 @@ public class UserController {
     public List<User> findAll() {
         return userService.list();
     }
+    @GetMapping("/role/{role}")
+    public Result findUserByRole(@PathVariable String role) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("role",role);
+        return Result.success(userService.list(wrapper));
+    }
 
     @GetMapping("/{id}")
     public User findOne(@PathVariable Integer id) {
@@ -62,23 +70,12 @@ public class UserController {
     }
 
     @GetMapping("/page")
-    public Page<User> findPage(@RequestParam Integer pageNum,
+    public Result findPage(@RequestParam Integer pageNum,
                                @RequestParam Integer pageSize,
                                @RequestParam(defaultValue = "") String username,
                                @RequestParam(defaultValue = "") String address,
                                @RequestParam(defaultValue = "") String email) {
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        if (!username.isEmpty()) {
-            wrapper.like("username", username);
-        }
-        if (!address.isEmpty()) {
-            wrapper.like("address", address);
-        }
-        if (!email.isEmpty()) {
-            wrapper.like("email", email);
-        }
-        wrapper.orderByDesc("id");
-        return userService.page(new Page<>(pageNum, pageSize), wrapper);
+        return Result.success(userService.findPage(new Page<>(pageNum, pageSize),username,email,address));
     }
 
 
@@ -149,5 +146,21 @@ public class UserController {
             return Result.error(Constants.CODE_400,"参数错误");
         }
         return Result.success(userService.register(userDto));
+    }
+    @PostMapping("/updatePwd")
+    public Result updatePwd(@RequestBody PwdDto pwdDto){
+        String oldPwd = pwdDto.getOldPwd();
+        String newPwd = pwdDto.getNewPwd();
+        if(StrUtil.isBlank(oldPwd)||StrUtil.isBlank(newPwd)){
+            return Result.error(Constants.CODE_400,"参数错误");
+        }
+        User curUser = TokenUtil.getCurUser();
+        if(curUser.getPassword().equals(oldPwd)){
+            curUser.setPassword(newPwd);
+            return Result.success(userService.updateById(curUser));
+        }else{
+            return Result.error(Constants.CODE_400,"密码错误");
+        }
+
     }
 }

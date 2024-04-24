@@ -48,8 +48,8 @@ public class MenuController {
     }
 
     @GetMapping
-    public Result findAll(@RequestParam(defaultValue = "") String name) {
-        return Result.success(menuService.getMenus(name));
+    public Result findAll(@RequestParam(defaultValue = "") String name,@RequestParam(defaultValue = "") String description) {
+        return Result.success(menuService.getMenus(name,description));
     }
 
     @GetMapping("/{id}")
@@ -67,7 +67,7 @@ public class MenuController {
             wrapper.like("name", name);
         }
 
-        wrapper.orderByDesc("id");
+        wrapper.orderByDesc("sort");
         return Result.success(menuService.page(new Page<>(pageNum, pageSize),wrapper));
     }
 

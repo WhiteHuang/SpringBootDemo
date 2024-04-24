@@ -23,10 +23,15 @@ import java.util.stream.Collectors;
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IMenuService {
 
     @Override
-    public List<Menu> getMenus(String name) {
+    public List<Menu> getMenus(String name,String description) {
         QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
         if (StrUtil.isNotBlank(name))
             queryWrapper.eq("name", name);
+        if (StrUtil.isNotBlank(description))
+            queryWrapper.eq("description", description);
+
+        queryWrapper.orderByAsc("sort");
+
         List<Menu> list = list(queryWrapper);
         List<Menu> parentMenus = list.stream().filter(menu -> menu.getPId() == null).collect(Collectors.toList());
         for (Menu menu : parentMenus) {

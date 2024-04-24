@@ -18,6 +18,7 @@ export default {
       expends: [],
       checks: [],
       roleId: 0,
+      roleKeyName: "",
     }
   },
   created() {
@@ -45,6 +46,7 @@ export default {
             if (res.code === '200') {
               this.tableData = res.data.records
               this.total = res.data.total
+              console.log(JSON.stringify(res.data.records))
             }
           })
 
@@ -61,6 +63,7 @@ export default {
     selectMenu(row) {
       this.dialogFormMenuVisible = true;
       this.roleId = row.id
+      this.roleKeyName = row.keyName
       console.log(row)
       this.request.get("/menu", {
         params: {}
@@ -129,8 +132,8 @@ export default {
             if (res.code === '200') {
               this.$message.success("绑定成功！")
               this.dialogFormMenuVisible = false
-              let curUserId = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).id : null
-              if (this.roleId === curUserId) {
+              let curUserRole = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).role : null
+              if (this.roleKeyName === curUserRole) {
                 this.$store.commit("logout")
               }
             } else {

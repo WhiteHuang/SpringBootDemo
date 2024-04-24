@@ -40,6 +40,8 @@ public class Menu implements Serializable {
 
     private String component;
 
+    private Integer sort;
+
     @TableField(exist = false)//表中未有字段忽略设置
     private List<Menu> children;
 }
