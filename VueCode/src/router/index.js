@@ -47,6 +47,39 @@ const routes = [
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
         component: () => import(/* webpackChunkName: "about" */ '../views/404.vue')
+    },
+
+    {
+        path: '/front',
+        name: 'front',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: () => import(/* webpackChunkName: "about" */ '../views/front/Front.vue'),
+        children:[
+            {
+                path: 'frontHome',
+                name: 'FrontHome',
+                // route level code-splitting
+                // this generates a separate chunk (about.[hash].js) for this route
+                // which is lazy-loaded when the route is visited.
+                component: () => import(/* webpackChunkName: "about" */ '../views/front/Home.vue')
+            },{
+                path: 'frontPerson',
+                name: 'FrontPerson',
+                // route level code-splitting
+                // this generates a separate chunk (about.[hash].js) for this route
+                // which is lazy-loaded when the route is visited.
+                component: () => import(/* webpackChunkName: "about" */ '../views/front/FrontPerson.vue')
+            },{
+                path: 'frontUpdatePwd',
+                name: 'FrontUpdatePwd',
+                // route level code-splitting
+                // this generates a separate chunk (about.[hash].js) for this route
+                // which is lazy-loaded when the route is visited.
+                component: () => import(/* webpackChunkName: "about" */ '../views/front/FrontUpdatePwd.vue')
+            },
+        ]
     }
 ]
 

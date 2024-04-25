@@ -34,7 +34,12 @@ export default {
                   console.log("成功")
                   localStorage.setItem("user",JSON.stringify(res.data))
                   setRouters()
-                  this.$router.push("/")
+                  if(res.data.role==='ROLE_STUDENT'){
+                    this.$router.push("/front/frontHome")
+                  }else{
+                    this.$router.push("/")
+                  }
+
                   this.$message.success("登录成功")
                 } else {
                   console.log("失败")

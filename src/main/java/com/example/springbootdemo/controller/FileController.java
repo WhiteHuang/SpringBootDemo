@@ -7,6 +7,7 @@ import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springbootdemo.common.Result;
+import com.example.springbootdemo.config.AuthAccess;
 import com.example.springbootdemo.entity.Files;
 import com.example.springbootdemo.service.IFileService;
 import jakarta.servlet.ServletOutputStream;
@@ -136,6 +137,11 @@ public class FileController {
     @PostMapping("/update")
     public Result save(@RequestBody Files files) {
         return Result.success(fileService.saveOrUpdate(files));
+    }
+    @GetMapping("/all")
+    @AuthAccess
+    public Result frontAll() {
+        return Result.success(fileService.list());
     }
 
 }
