@@ -1,9 +1,11 @@
 package com.example.springbootdemo.controller;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springbootdemo.common.Result;
@@ -13,6 +15,7 @@ import com.example.springbootdemo.service.IFileService;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,6 +43,11 @@ public class FileController {
 
     @Resource
     private IFileService fileService;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    public static final String FILES_KEY="FILES_FRONT_ALL";
 
     @PostMapping("/upload")
     public Result upload(@RequestParam MultipartFile file) throws IOException {
@@ -77,6 +85,7 @@ public class FileController {
         saveFile.setMd5(md5);
         fileService.save(saveFile);
 
+        flushRedis(FILES_KEY);
 
         return Result.success(url);
     }
@@ -119,19 +128,24 @@ public class FileController {
     }
 
     @PostMapping("/del/batch")
+//    @CacheEvict(value = "files" ,key = "'frontAll'",beforeInvocation = false)//清空缓存
     public Result deleteBatch(@RequestBody List<Integer> ids) {
         List<Files> files = fileService.listByIds(ids);
         for (Files file : files) {
             file.setIsDelete(true);
         }
+        flushRedis(FILES_KEY);
         return Result.success(fileService.updateBatchById(files));
     }
 
     @DeleteMapping("/{id}")
+//    @CachePut(value = "files",key = "'frontAll'")//单个挑缓存更新，操作成功后重新赋值
     public Result delete(@PathVariable Integer id) {
         Files files = fileService.getById(id);
         files.setIsDelete(true);
-        return Result.success(fileService.updateById(files));
+//        fileService.updateById(files);
+        flushRedis(FILES_KEY);
+        return Result.success(fileService.list());
     }
 
     @PostMapping("/update")
@@ -140,8 +154,26 @@ public class FileController {
     }
     @GetMapping("/all")
     @AuthAccess
+//    @Cacheable(value = "files",key = "'frontAll'")
     public Result frontAll() {
-        return Result.success(fileService.list());
+
+        //1、从缓存获取数据
+        String jsonStr = stringRedisTemplate.opsForValue().get(FILES_KEY);
+        List<Files> list;
+        if(StrUtil.isBlank(jsonStr)){//2、判断是否存在
+            list = fileService.list();
+            stringRedisTemplate.opsForValue().set(FILES_KEY,JSONUtil.toJsonStr(list));
+        }else{
+            list= JSONUtil.toBean(jsonStr, new TypeReference<List<Files>>() {
+            },true);
+        }
+
+        return Result.success(list);
+    }
+
+
+    private void flushRedis(String key){
+        stringRedisTemplate.delete(key);
     }
 
 }
